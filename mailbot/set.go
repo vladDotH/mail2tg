@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
-	"mail2telegram/state"
 )
 
 func (bot *Bot) Set(upd tgbotapi.Update) {
@@ -26,11 +25,9 @@ func (bot *Bot) Set(upd tgbotapi.Update) {
 			return
 		}
 
-		bot.State.DefaultImap = state.ImapParams{
-			Server: imapData.ImapServer,
-			User:   imapData.ImapUser,
-			Token:  imapData.ImapToken,
-		}
+		bot.State.DefaultImap.Server = imapData.ImapServer
+		bot.State.DefaultImap.User = imapData.ImapUser
+		bot.State.DefaultImap.Token = imapData.ImapToken
 
 		log.Printf("New imap params: %v", imapData)
 
