@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-// eqroeeovmjoefgwj
-
 func main() {
 	err := godotenv.Load()
 	if err != nil {
