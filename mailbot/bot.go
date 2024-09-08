@@ -93,7 +93,7 @@ mainLoop:
 			case ActDel:
 				bot.Del(update)
 			default:
-				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Неопозннаная команда"+update.Message.Command())
+				msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Неопозннаная команда "+update.Message.Command())
 				bot.Send(msg)
 			}
 		}
@@ -104,6 +104,6 @@ mainLoop:
 
 func (bot *Bot) Send(msg tgbotapi.Chattable) {
 	if _, err := bot.BotApi.Send(msg); err != nil {
-		log.Panic(err)
+		log.Printf("Error while sengins message: %v", err)
 	}
 }
