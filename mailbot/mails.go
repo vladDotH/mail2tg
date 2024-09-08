@@ -66,16 +66,19 @@ mainLoop:
 				i++
 			}
 
-			media := tgbotapi.NewMediaGroup(msg.Rule.Settings.ChatId, files)
-			media.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
-
 			tgMsg := tgbotapi.NewMessage(msg.Rule.Settings.ChatId, msgText.String())
 			tgMsg.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
+			if len(tgMsg.Text) > 0 {
+				bot.Send(tgMsg)
+			}
 
-			bot.Send(tgMsg)
-			_, err = bot.BotApi.SendMediaGroup(media)
-			if err != nil {
-				log.Panic(err)
+			if len(files) > 0 {
+				media := tgbotapi.NewMediaGroup(msg.Rule.Settings.ChatId, files)
+				media.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
+				_, err = bot.BotApi.SendMediaGroup(media)
+				if err != nil {
+					log.Panic(err)
+				}
 			}
 		}
 	}
