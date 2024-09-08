@@ -18,11 +18,33 @@ mainLoop:
 		case msg := <-bot.State.MailsChan:
 			log.Printf("Recieved: %v -> %v", msg.Rule.Settings.Box, msg.Rule.Settings.ChatId)
 
-			text := ""
+			msgText := strings.Builder{}
+
+			subject, err := msg.Msg.Header.Subject()
+			if err != nil {
+				fmt.Printf("Cannot read subject: %v", err)
+			} else {
+				msgText.WriteString("Subject: ")
+				msgText.WriteString(subject)
+				msgText.WriteString("\n")
+			}
+
+			from, err := msg.Msg.Header.AddressList("From")
+			if err != nil {
+				fmt.Printf("Cannot read from: %v", err)
+			} else {
+				msgText.WriteString("From: ")
+				for _, address := range from {
+					msgText.WriteString(address.Name)
+					msgText.WriteString(" <" + address.Address + "> ")
+				}
+				msgText.WriteString("\n")
+			}
+
 			for _, part := range msg.Msg.Inlines {
 				content, _, err := part.Header.ContentType()
 				if err == nil && strings.Contains(content, "text/plain") {
-					text = string(part.Body)
+					msgText.WriteString(string(part.Body))
 				}
 			}
 
@@ -46,11 +68,11 @@ mainLoop:
 
 			media := tgbotapi.NewMediaGroup(msg.Rule.Settings.ChatId, files)
 
-			tgMsg := tgbotapi.NewMessage(msg.Rule.Settings.ChatId, text)
+			tgMsg := tgbotapi.NewMessage(msg.Rule.Settings.ChatId, msgText.String())
 			tgMsg.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
 
 			bot.Send(tgMsg)
-			_, err := bot.BotApi.SendMediaGroup(media)
+			_, err = bot.BotApi.SendMediaGroup(media)
 			if err != nil {
 				log.Panic(err)
 			}
