@@ -77,7 +77,10 @@ mainLoop:
 				media.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
 				_, err = bot.BotApi.SendMediaGroup(media)
 				if err != nil {
-					log.Panic(err)
+					log.Printf("Cannot send files: %v", err)
+					errMsg := tgbotapi.NewMessage(msg.Rule.Settings.ChatId, "Не удалось отправить приложения к письму :(")
+					errMsg.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
+					bot.Send(errMsg)
 				}
 			}
 		}
