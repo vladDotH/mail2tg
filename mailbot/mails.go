@@ -67,6 +67,7 @@ mainLoop:
 			}
 
 			media := tgbotapi.NewMediaGroup(msg.Rule.Settings.ChatId, files)
+			media.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
 
 			tgMsg := tgbotapi.NewMessage(msg.Rule.Settings.ChatId, msgText.String())
 			tgMsg.ReplyToMessageID = msg.Rule.Settings.OriginalMsgId
