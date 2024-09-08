@@ -1,6 +1,14 @@
 FROM golang:1.23
-COPY go.mod go.sum ./
+WORKDIR /app
+
+ENV CGO_ENABLED=0
+ENV GOOS=linux
+
+ADD go.mod .
+ADD go.sum .
+
 RUN go mod download
-COPY *.go ./
-RUN CGO_ENABLED=0 GOOS=linux go build -o /app
-CMD ["/app"]
+COPY . .
+
+RUN go build -o ./bot
+CMD ["/app/bot"]
