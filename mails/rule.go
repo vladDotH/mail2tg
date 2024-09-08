@@ -93,12 +93,12 @@ ruleLoop:
 			for msg := messages.Next(); msg != nil; msg = messages.Next() {
 				parts, err := ParseMessageToParts(msg)
 				if err != nil {
-					log.Printf("Cannot parse message body: %v", err)
+					logger.Printf("Cannot parse message body: %v", err)
 				}
 
 				parsed, err := ParseMessageParts(parts)
 				if err != nil {
-					log.Printf("Cannot parse message parts: %v", err)
+					logger.Printf("Cannot parse message parts: %v", err)
 				}
 
 				rule.MailChan <- &parsed
