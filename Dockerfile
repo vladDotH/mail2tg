@@ -8,7 +8,9 @@ ADD go.mod .
 ADD go.sum .
 
 RUN go mod download
-COPY . .
+COPY --exclude=*.env . .
 
 RUN go build -o ./bot
+COPY *.env .
+
 CMD ["/app/bot"]
