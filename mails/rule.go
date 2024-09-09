@@ -33,17 +33,17 @@ ruleLoop:
 		func() {
 			mailClient, err := imapclient.DialTLS(settings.Imap.Server, nil)
 
+			if err != nil {
+				logger.Printf("Failed to dial %v IMAP server: %v", settings.Imap.Server, err)
+				return
+			}
+
 			defer func(mailClient *imapclient.Client) {
 				err := mailClient.Close()
 				if err != nil {
 					logger.Printf("Failed to close IMAP connection: %v", err)
 				}
 			}(mailClient)
-
-			if err != nil {
-				logger.Printf("Failed to dial %v IMAP server: %v", settings.Imap.Server, err)
-				return
-			}
 
 			if err := mailClient.Login(settings.Imap.User, settings.Imap.Token).Wait(); err != nil {
 				logger.Printf("Failed to login in %v: %v", settings.Imap.Server, err)
@@ -77,10 +77,6 @@ ruleLoop:
 			}
 
 			messages := mailClient.Fetch(seqSet, fetchOptions)
-			if err != nil {
-				logger.Printf("FETCH command failed: %v", err)
-				return
-			}
 
 			defer func(messages *imapclient.FetchCommand) {
 				err := messages.Close()
