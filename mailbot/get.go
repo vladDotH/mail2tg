@@ -28,7 +28,7 @@ func (bot *Bot) Get(upd tgbotapi.Update) {
 			),
 		)
 		if err != nil {
-			log.Panicf("Cannot write to builder: %v", err)
+			log.Printf("Cannot write to builder: %v", err)
 		}
 
 	} else {
@@ -42,11 +42,12 @@ func (bot *Bot) Get(upd tgbotapi.Update) {
 				),
 			)
 			if err != nil {
-				log.Panicf("Cannot write to builder: %v", err)
+				log.Printf("Cannot write to builder: %v", err)
 			}
 			return true
 		})
 	}
+
 	msg := tgbotapi.NewMessage(upd.Message.Chat.ID, strb.String())
 	bot.Send(msg)
 }
