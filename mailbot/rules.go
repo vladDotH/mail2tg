@@ -33,10 +33,12 @@ func (bot *Bot) RunRule(ruleData RuleSettingsData) {
 
 	go mails.RunMailerRule(&newRule)
 
-	for msg := range newRule.MailChan {
-		bot.State.MailsChan <- &state.BotMailPack{
-			Rule: &newRule,
-			Msg:  msg,
+	go func() {
+		for msg := range newRule.MailChan {
+			bot.State.MailsChan <- &state.BotMailPack{
+				Rule: &newRule,
+				Msg:  msg,
+			}
 		}
-	}
+	}()
 }

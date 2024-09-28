@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"github.com/joho/godotenv"
+	"github.com/peterbourgon/diskv/v3"
 	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"log"
+	"mail2telegram/db"
 	"mail2telegram/env"
 	"mail2telegram/mailbot"
 	"os"
@@ -14,6 +16,12 @@ import (
 )
 
 func main() {
+	db.Init(diskv.Options{
+		BasePath:     "./storage",
+		Transform:    func(s string) []string { return []string{} },
+		CacheSizeMax: 1024,
+	})
+
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatalf("Cannot read .env file: %v", err)

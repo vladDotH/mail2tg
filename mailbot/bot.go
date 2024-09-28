@@ -5,8 +5,14 @@ import (
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"github.com/puzpuzpuz/xsync/v3"
 	"log"
+	"mail2telegram/db"
 	"mail2telegram/env"
 	"mail2telegram/state"
+)
+
+const (
+	ImapDataKey  = "imapData"
+	RulesDataKey = "rules"
 )
 
 func NewBot(token string) *Bot {
@@ -61,6 +67,7 @@ func (bot *Bot) CreateActions() error {
 }
 
 func (bot *Bot) Run(ctx context.Context) {
+	bot.loadDBData()
 	go bot.RunMailsProcessing(ctx)
 
 	u := tgbotapi.NewUpdate(0)
@@ -105,5 +112,23 @@ mainLoop:
 func (bot *Bot) Send(msg tgbotapi.Chattable) {
 	if _, err := bot.BotApi.Send(msg); err != nil {
 		log.Printf("Error while sengins message: %v", err)
+	}
+}
+
+func (bot *Bot) loadDBData() {
+	imapData, err := db.Read[ImapSettingsData](ImapDataKey)
+	if err != nil {
+		log.Printf("Error while loading imap data %v", err)
+	} else {
+		bot.setImapData(imapData)
+	}
+
+	rulesData, err := db.Read[[]RuleSettingsData](RulesDataKey)
+	if err != nil {
+		log.Printf("Error while loading rules data %v", err)
+	} else {
+		for _, rule := range rulesData {
+			bot.RunRule(rule)
+		}
 	}
 }

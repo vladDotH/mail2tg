@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
 	"log"
+	"mail2telegram/db"
+	"mail2telegram/state"
 )
 
 func (bot *Bot) Set(upd tgbotapi.Update) {
@@ -25,11 +27,7 @@ func (bot *Bot) Set(upd tgbotapi.Update) {
 			return
 		}
 
-		bot.State.DefaultImap.Server = imapData.ImapServer
-		bot.State.DefaultImap.User = imapData.ImapUser
-		bot.State.DefaultImap.Token = imapData.ImapToken
-
-		log.Printf("New imap params: %v", imapData)
+		bot.setImapData(imapData)
 
 		msg := tgbotapi.NewMessage(upd.Message.Chat.ID, "Настройки imap обновлены")
 		bot.Send(msg)
@@ -46,7 +44,19 @@ func (bot *Bot) Set(upd tgbotapi.Update) {
 			return
 		}
 
-		go bot.RunRule(ruleData)
+		bot.RunRule(ruleData)
+
+		rules := make([]RuleSettingsData, 0, bot.State.Rules.Size())
+		bot.State.Rules.Range(func(_ string, value *state.RuleState) bool {
+			rules = append(rules, extractRuleSettings(value.Settings))
+			return true
+		})
+
+		err = db.Write(RulesDataKey, rules)
+		if err != nil {
+			log.Printf("Cannot save rules to db: %v", err)
+		}
+
 		msg := tgbotapi.NewMessage(upd.Message.Chat.ID, "Правило применено")
 		bot.Send(msg)
 
@@ -56,4 +66,16 @@ func (bot *Bot) Set(upd tgbotapi.Update) {
 		return
 	}
 
+}
+
+func (bot *Bot) setImapData(imapData ImapSettingsData) {
+	bot.State.DefaultImap.Server = imapData.ImapServer
+	bot.State.DefaultImap.User = imapData.ImapUser
+	bot.State.DefaultImap.Token = imapData.ImapToken
+	log.Printf("New imap params: %v", imapData)
+
+	err := db.Write(ImapDataKey, imapData)
+	if err != nil {
+		log.Printf("Cannot save imapData to db: %v", err)
+	}
 }
