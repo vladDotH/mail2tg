@@ -1,9 +1,11 @@
 package mailbot
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"jaytaylor.com/html2text"
 	"log"
 	"strings"
 )
@@ -43,8 +45,12 @@ mainLoop:
 
 			for _, part := range msg.Msg.Inlines {
 				content, _, err := part.Header.ContentType()
-				if err == nil && strings.Contains(content, "text/plain") {
-					msgText.WriteString(string(part.Body))
+				if err == nil && strings.Contains(content, "text/html") {
+					text, err := html2text.FromReader(bytes.NewReader(part.Body), html2text.Options{PrettyTables: true})
+					if err != nil {
+						log.Printf("Cannot parse html: %v", err)
+					}
+					msgText.WriteString(text)
 				}
 			}
 

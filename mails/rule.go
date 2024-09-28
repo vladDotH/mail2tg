@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"github.com/emersion/go-imap/v2"
 	"github.com/emersion/go-imap/v2/imapclient"
+	"github.com/emersion/go-message/charset"
 	"log"
 	"mail2telegram/state"
+	"mime"
 	"time"
 )
 
@@ -29,9 +31,10 @@ ruleLoop:
 		case <-time.After(time.Duration(settings.Delay) * time.Second):
 		}
 
+		imapOptions := imapclient.Options{WordDecoder: &mime.WordDecoder{CharsetReader: charset.Reader}}
 		// II RuleFunction
 		func() {
-			mailClient, err := imapclient.DialTLS(settings.Imap.Server, nil)
+			mailClient, err := imapclient.DialTLS(settings.Imap.Server, &imapOptions)
 
 			if err != nil {
 				logger.Printf("Failed to dial %v IMAP server: %v", settings.Imap.Server, err)
