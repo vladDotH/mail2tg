@@ -46,7 +46,7 @@ mainLoop:
 			for _, part := range msg.Msg.Inlines {
 				content, _, err := part.Header.ContentType()
 				if err == nil && strings.Contains(content, "text/html") {
-					text, err := html2text.FromReader(bytes.NewReader(part.Body), html2text.Options{PrettyTables: true})
+					text, err := html2text.FromReader(bytes.NewReader(part.Body), html2text.Options{PrettyTables: false})
 					if err != nil {
 						log.Printf("Cannot parse html: %v", err)
 					}
