@@ -40,18 +40,33 @@ mainLoop:
 					msgText.WriteString(address.Name)
 					msgText.WriteString(" <" + address.Address + "> ")
 				}
-				msgText.WriteString("\n")
+				msgText.WriteString("\n\n")
 			}
+
+			var plain, html string
 
 			for _, part := range msg.Msg.Inlines {
 				content, _, err := part.Header.ContentType()
-				if err == nil && strings.Contains(content, "text/html") {
-					text, err := html2text.FromReader(bytes.NewReader(part.Body), html2text.Options{PrettyTables: false})
-					if err != nil {
-						log.Printf("Cannot parse html: %v", err)
+				if err == nil {
+					if strings.Contains(content, "text/html") {
+						html, err = html2text.FromReader(bytes.NewReader(part.Body), html2text.Options{PrettyTables: false})
+						if err != nil {
+							log.Printf("Cannot parse html: %v", err)
+						}
+					} else if strings.Contains(content, "text/plain") {
+						plain = string(part.Body)
 					}
-					msgText.WriteString(text)
 				}
+			}
+
+			log.Print(plain)
+			log.Println("-------------")
+			log.Print(html)
+
+			if len(plain) > 0 {
+				msgText.WriteString(plain)
+			} else {
+				msgText.WriteString(html)
 			}
 
 			files := make([]interface{}, len(msg.Msg.Attachments))
