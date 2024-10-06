@@ -4,10 +4,11 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"jaytaylor.com/html2text"
 	"log"
 	"strings"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"jaytaylor.com/html2text"
 )
 
 func (bot *Bot) RunMailsProcessing(ctx context.Context) {
@@ -58,10 +59,6 @@ mainLoop:
 					}
 				}
 			}
-
-			log.Print(plain)
-			log.Println("-------------")
-			log.Print(html)
 
 			if len(plain) > 0 {
 				msgText.WriteString(plain)
