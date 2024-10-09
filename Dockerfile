@@ -13,5 +13,6 @@ COPY . .
 RUN go build -o ./bot
 
 FROM alpine:3.20
-COPY --from=builder /app /app
+WORKDIR /app
+COPY --from=builder /app .
 CMD ["/app/bot"]
