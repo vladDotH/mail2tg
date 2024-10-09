@@ -7,9 +7,9 @@
 - DEBUG - Debug режим (логи ТГ-бота)
 
 ## Деплой
->```docker build --tag 'm2tgbot' .```
+>```docker build --tag '<image-name>' .```
 
->```docker run -d m2tgbot```
+>```docker run --env-file ./.env -v ./storage:/app/storage <image-name>```
 
 ## Управление
 Настройка IMAP:
