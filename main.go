@@ -2,9 +2,6 @@ package main
 
 import (
 	"context"
-	"github.com/joho/godotenv"
-	"github.com/peterbourgon/diskv/v3"
-	"gopkg.in/natefinch/lumberjack.v2"
 	"io"
 	"log"
 	"mail2telegram/db"
@@ -13,6 +10,10 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
+	"github.com/joho/godotenv"
+	"github.com/peterbourgon/diskv/v3"
+	"gopkg.in/natefinch/lumberjack.v2"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 
 	err := godotenv.Load()
 	if err != nil {
-		log.Fatalf("Cannot read .env file: %v", err)
+		log.Printf("Cannot read .env file: %v", err)
 	}
 
 	env.LoadEnv()
