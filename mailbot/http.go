@@ -21,6 +21,7 @@ func (bot *Bot) StartHttpServer(ctx context.Context, wg *sync.WaitGroup) {
 	server := &http.Server{Addr: env.Env.HTTPAddr, Handler: mux}
 
 	go func() {
+		log.Printf("HTTP server starting at: %v\n", env.Env.HTTPAddr)
 		err := server.ListenAndServe()
 		if err != nil {
 			log.Printf("Listen&Serve result: %e\n", err)
