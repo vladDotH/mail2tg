@@ -7,10 +7,13 @@ import (
 )
 
 type EnvType struct {
-	TgToken string
-	AdminId int64
-	Debug   bool
-	LogFile string
+	TgToken       string
+	AdminId       int64
+	Debug         bool
+	LogFile       string
+	StoragePrefix string
+	HTTPPrefix    string
+	HTTPAddr      string
 }
 
 var Env = EnvType{}
@@ -38,8 +41,26 @@ func LoadEnv() {
 		debugVal = debug == "true"
 	}
 
+	storagePrefix, exists := os.LookupEnv("STORAGE_PREFIX")
+	if !exists {
+		log.Fatalf("Invalid storage prefix: %v", err)
+	}
+
+	httpPrefix, exists := os.LookupEnv("HTTP_PREFIX")
+	if !exists {
+		log.Fatalf("Invalid http prefix: %v", err)
+	}
+
+	httpAddr, exists := os.LookupEnv("HTTP_ADDR")
+	if !exists {
+		log.Fatalf("Invalid http address: %v", err)
+	}
+
 	Env.TgToken = tgToken
 	Env.AdminId = adminIdNum
 	Env.Debug = debugVal
 	Env.LogFile = "./logs"
+	Env.StoragePrefix = storagePrefix
+	Env.HTTPPrefix = httpPrefix
+	Env.HTTPAddr = httpAddr
 }

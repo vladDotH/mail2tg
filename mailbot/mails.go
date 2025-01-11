@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"regexp"
 	"strings"
 
 	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
@@ -46,12 +47,13 @@ mainLoop:
 				msgText.WriteString("\n\n")
 			}
 
-			var plain, html string
+			var plain, html, rawHtml string
 
 			for _, part := range msg.Msg.Inlines {
 				content, _, err := part.Header.ContentType()
 				if err == nil {
 					if strings.Contains(content, "text/html") {
+						rawHtml = string(part.Body)
 						html, err = html2text.FromReader(bytes.NewReader(part.Body), html2text.Options{PrettyTables: false})
 						if err != nil {
 							log.Printf("Cannot parse html: %v", err)
@@ -62,10 +64,22 @@ mainLoop:
 				}
 			}
 
+			var messageStr string
 			if len(plain) > 0 {
-				msgText.WriteString(plain)
+				messageStr = plain
 			} else {
-				msgText.WriteString(html)
+				messageStr = html
+			}
+
+			re := regexp.MustCompile("(?m)[\r\n]+^>+?.*$")
+			messageStr = re.ReplaceAllString(messageStr, "")
+			msgText.WriteString(messageStr)
+
+			id, err := bot.SaveMessage(rawHtml)
+
+			if err == nil {
+				msgText.WriteString("\r\n")
+				msgText.WriteString("Посмотреть полное сообщение: " + UUID2URL(id))
 			}
 
 			files := make([]interface{}, len(msg.Msg.Attachments))

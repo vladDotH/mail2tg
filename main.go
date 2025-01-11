@@ -53,8 +53,9 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	wg.Add(1)
+	wg.Add(2)
 	go bot.Run(ctx, &wg)
+	go bot.StartHttpServer(ctx, &wg)
 
 	<-ctx.Done()
 	log.Println("Stopping mailbot...")
