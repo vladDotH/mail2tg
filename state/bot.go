@@ -1,6 +1,11 @@
 package state
 
-import "github.com/puzpuzpuz/xsync/v3"
+import (
+	"context"
+	"sync"
+
+	"github.com/puzpuzpuz/xsync/v3"
+)
 
 type BotMailPack struct {
 	Rule *RuleState
@@ -11,4 +16,6 @@ type BotState struct {
 	Rules       xsync.MapOf[string, *RuleState]
 	DefaultImap ImapParams
 	MailsChan   chan *BotMailPack
+	Wg          *sync.WaitGroup
+	Ctx         context.Context
 }

@@ -2,6 +2,7 @@ package state
 
 import (
 	"context"
+
 	"github.com/emersion/go-imap/v2"
 )
 

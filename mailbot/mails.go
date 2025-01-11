@@ -12,6 +12,8 @@ import (
 )
 
 func (bot *Bot) RunMailsProcessing(ctx context.Context) {
+	defer bot.State.Wg.Done()
+
 mainLoop:
 	for {
 		select {

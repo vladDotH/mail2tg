@@ -9,7 +9,7 @@ import (
 	"mail2telegram/mailbot"
 	"os"
 	"os/signal"
-	"time"
+	"sync"
 
 	"github.com/joho/godotenv"
 	"github.com/peterbourgon/diskv/v3"
@@ -49,20 +49,15 @@ func main() {
 		log.Printf("Cannot create actions: %v", err)
 	}
 
-	ctx, cancel := context.WithCancel(context.Background())
+	wg := sync.WaitGroup{}
+	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer cancel()
 
-	go bot.Run(ctx)
+	wg.Add(1)
+	go bot.Run(ctx, &wg)
 
-	exit := make(chan os.Signal, 1)
-	signal.Notify(exit, os.Interrupt, os.Kill)
-
-	for {
-		select {
-		case <-exit:
-			log.Println("Stopping mailbot...")
-			cancel()
-			time.Sleep(2 * time.Second)
-			return
-		}
-	}
+	<-ctx.Done()
+	log.Println("Stopping mailbot...")
+	wg.Wait()
+	log.Println("Mailbot stopped")
 }

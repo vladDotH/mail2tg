@@ -31,14 +31,25 @@ func (bot *Bot) RunRule(ruleData RuleSettingsData) {
 
 	bot.State.Rules.Store(ruleData.Name, &newRule)
 
-	go mails.RunMailerRule(&newRule)
-
+	bot.State.Wg.Add(1)
 	go func() {
+		defer bot.State.Wg.Done()
+		mails.RunMailerRule(&newRule)
+	}()
+
+	bot.State.Wg.Add(1)
+	go func() {
+		defer bot.State.Wg.Done()
 		for msg := range newRule.MailChan {
 			bot.State.MailsChan <- &state.BotMailPack{
 				Rule: &newRule,
 				Msg:  msg,
 			}
 		}
+	}()
+
+	go func() {
+		<-bot.State.Ctx.Done()
+		cancel()
 	}()
 }

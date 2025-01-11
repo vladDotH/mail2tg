@@ -2,12 +2,14 @@ package mailbot
 
 import (
 	"context"
-	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
-	"github.com/puzpuzpuz/xsync/v3"
 	"log"
 	"mail2telegram/db"
 	"mail2telegram/env"
 	"mail2telegram/state"
+	"sync"
+
+	tgbotapi "github.com/go-telegram-bot-api/telegram-bot-api/v5"
+	"github.com/puzpuzpuz/xsync/v3"
 )
 
 const (
@@ -66,8 +68,14 @@ func (bot *Bot) CreateActions() error {
 	return err
 }
 
-func (bot *Bot) Run(ctx context.Context) {
+func (bot *Bot) Run(ctx context.Context, wg *sync.WaitGroup) {
+	defer wg.Done()
+	bot.State.Ctx = ctx
+	bot.State.Wg = wg
+
 	bot.loadDBData()
+
+	bot.State.Wg.Add(1)
 	go bot.RunMailsProcessing(ctx)
 
 	u := tgbotapi.NewUpdate(0)
@@ -106,7 +114,7 @@ mainLoop:
 		}
 	}
 
-	log.Print("Bot stopped")
+	log.Print("Main loop stopped")
 }
 
 func (bot *Bot) Send(msg tgbotapi.Chattable) {
