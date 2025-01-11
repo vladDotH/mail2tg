@@ -28,7 +28,7 @@ mainLoop:
 
 			subject, err := msg.Msg.Header.Subject()
 			if err != nil {
-				fmt.Printf("Cannot read subject: %v", err)
+				log.Printf("Cannot read subject: %v", err)
 			} else {
 				msgText.WriteString("Subject: ")
 				msgText.WriteString(subject)
@@ -37,7 +37,7 @@ mainLoop:
 
 			from, err := msg.Msg.Header.AddressList("From")
 			if err != nil {
-				fmt.Printf("Cannot read from: %v", err)
+				log.Printf("Cannot read from: %v", err)
 			} else {
 				msgText.WriteString("From: ")
 				for _, address := range from {
