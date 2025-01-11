@@ -9,6 +9,7 @@ import (
 	"mail2telegram/mailbot"
 	"os"
 	"os/signal"
+	"path/filepath"
 	"sync"
 
 	"github.com/joho/godotenv"
@@ -29,6 +30,11 @@ func main() {
 	}
 
 	env.LoadEnv()
+
+	err = os.MkdirAll(filepath.Join(".", env.Env.StoragePrefix), os.ModePerm)
+	if (err) != nil {
+		log.Printf("Cannot create emails storage\n")
+	}
 
 	logger := lumberjack.Logger{
 		Filename:   env.Env.LogFile,
