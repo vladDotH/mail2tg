@@ -12,6 +12,8 @@ import (
 	"jaytaylor.com/html2text"
 )
 
+const MAX_MSG_LEN = 3800
+
 func (bot *Bot) RunMailsProcessing(ctx context.Context) {
 	defer bot.State.Wg.Done()
 
@@ -73,12 +75,16 @@ mainLoop:
 
 			re := regexp.MustCompile("(?m)[\r\n]+^>+?.*$")
 			messageStr = re.ReplaceAllString(messageStr, "")
+
+			if msgText.Len()+len(messageStr) > MAX_MSG_LEN {
+				messageStr = messageStr[:(MAX_MSG_LEN-msgText.Len())] + "......"
+			}
 			msgText.WriteString(messageStr)
 
 			id, err := bot.SaveMessage(rawHtml)
 
 			if err == nil {
-				msgText.WriteString("\r\n")
+				msgText.WriteString("\r\n\r\n---\r\n")
 				msgText.WriteString("Посмотреть полное сообщение: " + UUID2URL(id))
 			}
 
