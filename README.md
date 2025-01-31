@@ -6,10 +6,14 @@
 - ADMIN_ID - Id пользователя-администратора (отправляет команды боту)
 - DEBUG - Debug режим (логи ТГ-бота)
 
-## Деплой
+## Деплой со сборкой
 >```docker build --tag '<image-name>' .```
 
 >```docker run --env-file ./.env -v ./storage:/app/storage <image-name>```
+
+## Деплой с образом из Dockerhub
+>```docker run --env-file ./.env -v ./storage:/app/storage vladdoth/mail2tg:latest```
+
 
 ## Управление
 Настройка IMAP:
