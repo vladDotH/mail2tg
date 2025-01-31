@@ -119,7 +119,7 @@ mainLoop:
 
 func (bot *Bot) Send(msg tgbotapi.Chattable) {
 	if _, err := bot.BotApi.Send(msg); err != nil {
-		log.Printf("Error while sengins message: %v", err)
+		log.Printf("Error while sending message: %v", err)
 	}
 }
 
