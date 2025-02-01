@@ -43,17 +43,17 @@ func LoadEnv() {
 
 	storagePrefix, exists := os.LookupEnv("STORAGE_PREFIX")
 	if !exists {
-		log.Fatalf("Invalid storage prefix: %v", err)
+		log.Printf("Invalid storage prefix: %v", err)
 	}
 
 	httpPrefix, exists := os.LookupEnv("HTTP_PREFIX")
 	if !exists {
-		log.Fatalf("Invalid http prefix: %v", err)
+		log.Printf("Invalid http prefix: %v", err)
 	}
 
 	httpAddr, exists := os.LookupEnv("HTTP_ADDR")
 	if !exists {
-		log.Fatalf("Invalid http address: %v", err)
+		log.Printf("Invalid http address: %v", err)
 	}
 
 	Env.TgToken = tgToken

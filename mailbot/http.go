@@ -15,28 +15,32 @@ import (
 func (bot *Bot) StartHttpServer(ctx context.Context, wg *sync.WaitGroup) {
 	defer wg.Done()
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/"+env.Env.StoragePrefix+"/{id}", getMail)
+	if len(env.Env.HTTPAddr) > 0 {
+		mux := http.NewServeMux()
+		mux.HandleFunc("/"+env.Env.StoragePrefix+"/{id}", getMail)
 
-	server := &http.Server{Addr: env.Env.HTTPAddr, Handler: mux}
+		server := &http.Server{Addr: env.Env.HTTPAddr, Handler: mux}
 
-	go func() {
-		log.Printf("HTTP server starting at: %v\n", env.Env.HTTPAddr)
-		err := server.ListenAndServe()
+		go func() {
+			log.Printf("HTTP server starting at: %v\n", env.Env.HTTPAddr)
+			err := server.ListenAndServe()
+			if err != nil {
+				log.Printf("Listen&Serve result: %e\n", err)
+			}
+		}()
+
+		<-ctx.Done()
+
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		err := server.Shutdown(shutdownCtx)
 		if err != nil {
-			log.Printf("Listen&Serve result: %e\n", err)
+			log.Printf("Shutdown error: %e\n", err)
 		}
-	}()
-
-	<-ctx.Done()
-
-	shutdownCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-	err := server.Shutdown(shutdownCtx)
-	if err != nil {
-		log.Printf("Shutdown error: %e\n", err)
+		log.Println("Http server shutted down")
+	} else {
+		log.Println("Http server has not started (missing HttpAddr)")
 	}
-	log.Println("Http server shutted down")
 }
 
 func getMail(writer http.ResponseWriter, req *http.Request) {

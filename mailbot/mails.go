@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"mail2telegram/env"
 	"regexp"
 	"strings"
 
@@ -83,7 +84,7 @@ mainLoop:
 
 			id, err := bot.SaveMessage(rawHtml)
 
-			if err == nil {
+			if err == nil && len(env.Env.HTTPAddr) > 0 {
 				msgText.WriteString("\r\n\r\n---\r\n")
 				msgText.WriteString("Посмотреть полное сообщение: " + UUID2URL(id))
 			}
